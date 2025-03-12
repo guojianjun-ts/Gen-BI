@@ -1,5 +1,5 @@
 import { outLogin } from '@/services/ant-design-pro/api';
-import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import {LogoutOutlined, QuestionCircleOutlined, SettingOutlined, UserOutlined} from '@ant-design/icons';
 import { history, useModel } from '@umijs/max';
 import { Spin } from 'antd';
 import { createStyles } from 'antd-style';
@@ -17,7 +17,7 @@ export type GlobalHeaderRightProps = {
 export const AvatarName = () => {
   const { initialState } = useModel('@@initialState');
   const { currentUser } = initialState || {};
-  return <span className="anticon">{currentUser?.name}</span>;
+  return <span className="anticon">{currentUser?.userName}</span>;
 };
 
 const useStyles = createStyles(({ token }) => {
@@ -34,6 +34,13 @@ const useStyles = createStyles(({ token }) => {
       '&:hover': {
         backgroundColor: token.colorBgTextHover,
       },
+    },
+    //使得用户头像固定在右上方
+    avatarDropdown: {
+      position: 'fixed', // 固定定位
+      top: 16, // 距离顶部 16px
+      right: 16, // 距离右侧 16px
+      zIndex: 999, // 确保在最上层
     },
   };
 });
@@ -95,7 +102,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
 
   const { currentUser } = initialState;
 
-  if (!currentUser || !currentUser.name) {
+  if (!currentUser || !currentUser.userAvatar) {
     return loading;
   }
 
@@ -125,14 +132,17 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
   ];
 
   return (
-    <HeaderDropdown
-      menu={{
-        selectedKeys: [],
-        onClick: onMenuClick,
-        items: menuItems,
-      }}
-    >
-      {children}
-    </HeaderDropdown>
-  );
+    <div className={styles.avatarDropdown}>
+      <HeaderDropdown
+        menu={{
+          selectedKeys: [],
+          onClick: onMenuClick,
+          items: menuItems,
+        }}
+      >
+        {children}
+      </HeaderDropdown>
+    </div>
+)
+  ;
 };
