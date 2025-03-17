@@ -1,5 +1,4 @@
-import { outLogin } from '@/services/ant-design-pro/api';
-import {LogoutOutlined, QuestionCircleOutlined, SettingOutlined, UserOutlined} from '@ant-design/icons';
+import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { history, useModel } from '@umijs/max';
 import { Spin } from 'antd';
 import { createStyles } from 'antd-style';
@@ -35,13 +34,6 @@ const useStyles = createStyles(({ token }) => {
         backgroundColor: token.colorBgTextHover,
       },
     },
-    //使得用户头像固定在右上方
-    avatarDropdown: {
-      position: 'fixed', // 固定定位
-      top: 16, // 距离顶部 16px
-      right: 16, // 距离右侧 16px
-      zIndex: 999, // 确保在最上层
-    },
   };
 });
 
@@ -50,7 +42,6 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
    * 退出登录，并且将当前的 url 保存
    */
   const loginOut = async () => {
-    await outLogin();
     const { search, pathname } = window.location;
     const urlParams = new URL(window.location.href).searchParams;
     /** 此方法会跳转到 redirect 参数所在的位置 */
@@ -102,27 +93,27 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
 
   const { currentUser } = initialState;
 
-  if (!currentUser || !currentUser.userAvatar) {
+  if (!currentUser || !currentUser.userName) {
     return loading;
   }
 
   const menuItems = [
     ...(menu
       ? [
-          {
-            key: 'center',
-            icon: <UserOutlined />,
-            label: '个人中心',
-          },
-          {
-            key: 'settings',
-            icon: <SettingOutlined />,
-            label: '个人设置',
-          },
-          {
-            type: 'divider' as const,
-          },
-        ]
+        {
+          key: 'center',
+          icon: <UserOutlined />,
+          label: '个人中心',
+        },
+        {
+          key: 'settings',
+          icon: <SettingOutlined />,
+          label: '个人设置',
+        },
+        {
+          type: 'divider' as const,
+        },
+      ]
       : []),
     {
       key: 'logout',
@@ -132,17 +123,14 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
   ];
 
   return (
-    <div className={styles.avatarDropdown}>
-      <HeaderDropdown
-        menu={{
-          selectedKeys: [],
-          onClick: onMenuClick,
-          items: menuItems,
-        }}
-      >
-        {children}
-      </HeaderDropdown>
-    </div>
-)
-  ;
+    <HeaderDropdown
+      menu={{
+        selectedKeys: [],
+        onClick: onMenuClick,
+        items: menuItems,
+      }}
+    >
+      {children}
+    </HeaderDropdown>
+  );
 };
