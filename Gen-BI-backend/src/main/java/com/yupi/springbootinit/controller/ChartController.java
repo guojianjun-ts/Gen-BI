@@ -15,6 +15,7 @@ import com.yupi.springbootinit.constant.UserConstant;
 import com.yupi.springbootinit.exception.BusinessException;
 import com.yupi.springbootinit.exception.ThrowUtils;
 import com.yupi.springbootinit.manager.AiManager;
+import com.yupi.springbootinit.manager.RedisLimiterManager;
 import com.yupi.springbootinit.model.dto.chart.*;
 import com.yupi.springbootinit.model.entity.Chart;
 import com.yupi.springbootinit.model.entity.User;
@@ -52,6 +53,10 @@ public class ChartController {
 
     @Resource
     private AiManager aiManager;
+
+    // 引用
+    @Resource
+    private RedisLimiterManager redisLimiterManager;
 
     // region 增删改查
 
@@ -250,7 +255,7 @@ public class ChartController {
         // 通过response对象拿到用户id(必须登录才能使用)
         User loginUser = userService.getLoginUser(request);
         // 限流判断，每个用户一个限流器
-//        redisLimiterManager.doRateLimit("genChartByAi_" + loginUser.getId());
+        redisLimiterManager.doRateLimit("genChartByAi_" + loginUser.getId());
         // 分析需求：
         // 分析网站用户的增长情况
         // 原始数据：
