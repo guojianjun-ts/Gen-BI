@@ -218,7 +218,6 @@ public class ChartController {
      *
      * @param multipartFile
      * @param genChartByAiRequest
-     * @param request
      * @return
      */
     @PostMapping("/gen")
@@ -228,19 +227,27 @@ public class ChartController {
         String goal = genChartByAiRequest.getGoal();
         String chartType = genChartByAiRequest.getChartType();
         // 校验
+        // 如果分析目标为空，就抛出请求参数错误异常，并给出提示
         ThrowUtils.throwIf(org.apache.commons.lang3.StringUtils.isBlank(goal), ErrorCode.PARAMS_ERROR, "目标为空");
+        // 如果名称不为空，并且名称长度大于100，就抛出异常，并给出提示
         ThrowUtils.throwIf(org.apache.commons.lang3.StringUtils.isNotBlank(name) && name.length() > 100, ErrorCode.PARAMS_ERROR, "名称过长");
+
         // 校验文件
+        // 获取文件的大小
         long size = multipartFile.getSize();
+        // 取得文件原始名
         String originalFilename = multipartFile.getOriginalFilename();
         // 校验文件大小
         final long ONE_MB = 1024 * 1024L;
         ThrowUtils.throwIf(size > ONE_MB, ErrorCode.PARAMS_ERROR, "文件超过 1M");
-        // 校验文件后缀 aaa.png
+        // 校验文件后缀(一般文件是aaa.xxx格式,我们要取到.<点>后面的内容)
+        // 这里利用FileUtil工具类中的getSuffix方法获取文件后缀名
         String suffix = FileUtil.getSuffix(originalFilename);
         final List<String> validFileSuffixList = Arrays.asList("xlsx");
+        // 如果suffix的后缀不在List的范围内,抛出异常,并提示'文件后缀非法'
         ThrowUtils.throwIf(!validFileSuffixList.contains(suffix), ErrorCode.PARAMS_ERROR, "文件后缀非法");
 
+        // 通过response对象拿到用户id(必须登录才能使用)
         User loginUser = userService.getLoginUser(request);
         // 限流判断，每个用户一个限流器
 //        redisLimiterManager.doRateLimit("genChartByAi_" + loginUser.getId());
@@ -295,9 +302,7 @@ public class ChartController {
 
     /**
      * 获取查询包装类
-     *
-     * @param chartQueryRequest
-     * @return
+     * @return queryWrapper
      */
     private QueryWrapper<Chart> getQueryWrapper(ChartQueryRequest chartQueryRequest) {
         QueryWrapper<Chart> queryWrapper = new QueryWrapper<>();
